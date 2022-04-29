@@ -37,11 +37,12 @@ const int BOTON2 = 14; // Alta demanda
 const int BOTON3 = 15; // Sobre carga de funcionamient
 const int LED1 = 2;    //  Refrigeración Manual
 const int LED2 = 4;    // Refrigeración Automática
+const double temAlta = 33.5;  // set point de temperatura Alta
 
 // Variables
 int dato;              // Estado lógico BOTON1
 int dato2, dato3;      // Estado lógico BOTON2 Y BOTON3
-double timeStart, timeFinish;
+double TiempoActual, TiempoObjetivo;
 
 // Definición de objetos
   #define DHTPIN 12    // Pin 12 se conecta el DHT11
@@ -60,7 +61,7 @@ void setup() {// Inicio de void setup ()
   pinMode (LED2, OUTPUT);  // Configurar pin 4 LED2 como salida
   digitalWrite (LED1, LOW);
   digitalWrite (LED2, LOW);
-  timeStart = millis() +2000;  // Se asigna a timeStart el tiempo actual en milisegundos y se le suman 2000 milisegundos
+  TiempoObjetivo = millis() +2000;  // Se asigna a timeStart el tiempo actual en milisegundos y se le suman 2000 milisegundos
   
 }// Fin de void setup
 
@@ -75,12 +76,12 @@ void loop() {// Inicio de void loop
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
-  timeFinish = millis(); // tiempo actual en milisegundos
-  if (timeFinish >= timeStart){  // esta condición se cunple cada 2000 milisegundos
+  TiempoActual = millis(); // tiempo actual en milisegundos
+  if (TiempoActual >= TiempoObjetivo){  // esta condición se cunple cada 2000 milisegundos
     Serial.print(F("%  Temperatura: "));
     Serial.print(t);
     Serial.println(F("°C "));
-    timeStart = millis() +2000; // una vez que imprime temperatura se actualiza nuestro setpoint a los siguientes 20000 milisegundos
+    TiempoObjetivo = millis() +2000; // una vez que imprime temperatura se actualiza nuestro setpoint a los siguientes 20000 milisegundos
   }
   dato = digitalRead(BOTON1); // se guarda en dato el estado lógico del BOTON1 (recuerda que si no est presionado te envía un 1 lógico)
   //digitalWrite (LED1, !dato); 
@@ -88,11 +89,11 @@ void loop() {// Inicio de void loop
   dato3 = digitalRead (BOTON3); // se guarda en dato3 el estado lógico del BOTON3 (recuerda que si no est presionado te envía un 1 lógico)
   
   //Cuando debe de encender la refrigeración manual
-  // (t > 28.5 && (!dato2 || !dato3))
+  // (t > temAlta && (!dato2 || !dato3))
   //Si temperatura es alta y cualquiera de (alta demanda o sobrecarga) se enciende refrigeración manual
   // o 
   // (|| !dato) si se presiona el boton de manual
-  if ((t > 28.5 && (!dato2 || !dato3)) || !dato) {
+  if ((t > temAlta && (!dato2 || !dato3)) || !dato) {
     digitalWrite (LED1, 1);
     }
   else{
@@ -106,7 +107,7 @@ void loop() {// Inicio de void loop
   // ((!dato2 || !dato3) && dato)
   // Si se tiene alta demanda o sobrecarga y que no este presionado BOTON1 
   // de manual por la prioridad
-  if (t > 28.5 || ((!dato2 || !dato3) && dato)) {
+  if (t > temAlta || ((!dato2 || !dato3) && dato)) {
     digitalWrite (LED2, 1);
     }
   else{
