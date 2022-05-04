@@ -33,12 +33,12 @@
 #include <WiFi.h>  // Biblioteca para el control de WiFi
 #include <PubSubClient.h> //Biblioteca para conexion MQTT
 
-const char* ssid = "MEGACABLE-279F";  // Aquí debes poner el nombre de tu red
-const char* password = "Notiene13";  // Aquí debes poner la contraseña de tu red
+const char* ssid = "IoT";  // Aquí debes poner el nombre de tu red
+const char* password = "cursoiot";  // Aquí debes poner la contraseña de tu red
 
 //Datos del broker MQTT
-const char* mqtt_server = "192.168.100.85"; // Si estas en una red local, coloca la IP asignada, en caso contrario, coloca la IP publica
-IPAddress server(192,168,100,85);
+const char* mqtt_server = "35.157.221.58"; // Si estas en una red local, coloca la IP asignada, en caso contrario, coloca la IP publica
+IPAddress server(35,157,221,58);
 
 // Objetos
 WiFiClient espClient; // Este objeto maneja los datos de conexion WiFi
@@ -56,12 +56,13 @@ const double temAlta = 32.5;  // set point de temperatura Alta
 // Variables
 bool EstadoBoton1;              // Estado lógico BOTON1
 bool EstadoBoton2, EstadoBoton3;      // Estado lógico BOTON2 Y BOTON3
-bool BtnWeb1;
+bool BtnWeb1, BtnWeb2, BtnWeb3;
+
 double TiempoActual, TiempoObjetivo;
 float t=0;
 long timeNow, timeLast; // Variables de control de tiempo no bloqueante
 int data = 0; // Contador
-int wait = 5000;  // Indica la espera cada 5 segundos para envío de mensajes MQTT
+int wait = 3000;  // Indica la espera cada 5 segundos para envío de mensajes MQTT
 
 
 // Definición de objetos
@@ -181,7 +182,7 @@ void Logica(){
   //Si temperatura es alta y cualquiera de (alta demanda o sobrecarga) se enciende refrigeración manual
   // o 
   // (|| !dato1) si se presiona el boton de manual
-  if ((t > temAlta && (EstadoBoton2 || EstadoBoton3)) || EstadoBoton1) {
+  if (BtnWeb2 || (t > temAlta && (EstadoBoton2 || EstadoBoton3)) || EstadoBoton1) {
     digitalWrite (LED1, 1);
     }
   else{
@@ -227,17 +228,28 @@ void callback(char* topic, byte* message, unsigned int length) {
   // Ejemplo, en caso de recibir el mensaje true - false, se cambiará el estado del led soldado en la placa.
   // El ESP323CAM está suscrito al tema esp/output
   if (String(topic) == "esp32/output") {  // En caso de recibirse mensaje en el tema esp32/output
-    if(messageTemp == "true"){
-      Serial.println("Led encendido");
+    if(messageTemp == "btn1on"){
+     // Serial.println("Led encendido");
       BtnWeb1=1;
       //digitalWrite(flashLedPin, HIGH);
     }// fin del if (String(topic) == "esp32/output")
-    else if(messageTemp == "false"){
-      Serial.println("Led apagado");
+    else if(messageTemp == "btn1off"){
+      //Serial.println("Led apagado");
       BtnWeb1=0;
      // digitalWrite(flashLedPin, LOW);
     }// fin del else if(messageTemp == "false")
+
+    else if(messageTemp == "btn2on"){
+      //Serial.println("Led apagado");
+      BtnWeb2=1;
+    }
+    else if(messageTemp == "btn2off"){
+      //Serial.println("Led apagado");
+      BtnWeb2=0;  
+    }
   }// fin del if (String(topic) == "esp32/output")
+
+  
 }// fin del void callback
 
 // Función para reconectarse
