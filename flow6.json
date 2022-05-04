@@ -11,7 +11,7 @@
         "type": "mqtt in",
         "z": "1fa46118f4f122b4",
         "name": "",
-        "topic": "esp32/data",
+        "topic": "CodigoIoT/SIC/Flow6/Temperatura",
         "qos": "2",
         "datatype": "auto",
         "broker": "cd19ad63313fa054",
@@ -19,7 +19,7 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 120,
+        "x": 200,
         "y": 120,
         "wires": [
             [
@@ -41,7 +41,7 @@
         "format": "{{msg.payload}}",
         "layout": "row-spread",
         "className": "",
-        "x": 350,
+        "x": 430,
         "y": 120,
         "wires": []
     },
@@ -84,7 +84,7 @@
         "type": "mqtt out",
         "z": "1fa46118f4f122b4",
         "name": "",
-        "topic": "esp32/output",
+        "topic": "CodigoIoT/SIC/Flow6/Botones",
         "qos": "2",
         "retain": "",
         "respTopic": "",
@@ -93,7 +93,7 @@
         "correl": "",
         "expiry": "",
         "broker": "cd19ad63313fa054",
-        "x": 370,
+        "x": 510,
         "y": 180,
         "wires": []
     },
@@ -110,7 +110,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 370,
+        "x": 450,
         "y": 80,
         "wires": []
     },
@@ -142,6 +142,40 @@
         "className": "",
         "x": 150,
         "y": 260,
+        "wires": [
+            [
+                "33f9f28a2a006091"
+            ]
+        ]
+    },
+    {
+        "id": "b670df7dc2a3e4e6",
+        "type": "ui_switch",
+        "z": "1fa46118f4f122b4",
+        "name": "",
+        "label": "Sobrecarga",
+        "tooltip": "",
+        "group": "f4e702beb3672006",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "btn3on",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "btn3off",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 150,
+        "y": 340,
         "wires": [
             [
                 "33f9f28a2a006091"

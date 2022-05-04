@@ -51,7 +51,9 @@ const int pinBOTON2 = 14; // Alta demanda
 const int pinBOTON3 = 15; // Sobre carga de funcionamient
 const int LED1 = 2;    //  Refrigeración Manual
 const int LED2 = 4;    // Refrigeración Automática
-const double temAlta = 32.5;  // set point de temperatura Alta
+const double temAlta = 30.5;  // set point de temperatura Alta
+const String TopicTx = "CodigoIoT/SIC/Flow6/Botones";
+const String TopicRx = "CodigoIoT/SIC/Flow6/Temperatura";
 
 // Variables
 bool EstadoBoton1;              // Estado lógico BOTON1
@@ -62,7 +64,7 @@ double TiempoActual, TiempoObjetivo;
 float t=0;
 long timeNow, timeLast; // Variables de control de tiempo no bloqueante
 int data = 0; // Contador
-int wait = 3000;  // Indica la espera cada 5 segundos para envío de mensajes MQTT
+int wait = 2000;  // Indica la espera cada 5 segundos para envío de mensajes MQTT
 
 
 // Definición de objetos
@@ -89,9 +91,6 @@ void setup() {// Inicio de void setup ()
   WiFi.begin(ssid, password); // Esta es la función que realiz la conexión a WiFi
  
   while (WiFi.status() != WL_CONNECTED) { // Este bucle espera a que se realice la conexión
-    //digitalWrite (statusLedPin, HIGH);
-    //delay(500); //dado que es de suma importancia esperar a la conexión, debe usarse espera bloqueante
-    //digitalWrite (statusLedPin, LOW);
     Serial.print(".");  // Indicador de progreso
     delay (500);
   }
@@ -117,7 +116,6 @@ void setup() {// Inicio de void setup ()
   
 }// Fin de void setup
 
-// Cuerpo del programa - Se ejecuta constamente
 void loop() {// Inicio de void loop
 
   TiempoActual = millis(); // tiempo actual en milisegundos
@@ -132,20 +130,18 @@ void loop() {// Inicio de void loop
    //Verificar siempre que haya conexión al broker
   if (!client.connected()) {
     reconnect();  // En caso de que no haya conexión, ejecutar la función de reconexión, definida despues del void setup ()
-  }// fin del if (!client.connected())
+  }
   client.loop(); // Esta función es muy importante, ejecuta de manera no bloqueante las funciones necesarias para la comunicación con el broker
   
-  timeNow = millis(); // Control de tiempo para esperas no bloqueantes
-  if (timeNow - timeLast > wait) { // Manda un mensaje por MQTT cada cinco segundos
-    timeLast = timeNow; // Actualización de seguimiento de tiempo
-
-    //data++; // Incremento a la variable para ser enviado por MQTT
-    char dataString[8]; // Define una arreglo de caracteres para enviarlos por MQTT, especifica la longitud del mensaje en 8 caracteres
-    dtostrf(t, 2, 1, dataString);  // Esta es una función nativa de leguaje AVR que convierte un arreglo de caracteres en una variable String
-    Serial.print("Contador: "); // Se imprime en monitor solo para poder visualizar que el evento sucede
-    Serial.println(dataString);
-    client.publish("esp32/data", dataString); // Esta es la función que envía los datos por MQTT, especifica el tema y el valor
-  }// fin del if (timeNow - timeLast > wait) 
+//  timeNow = millis(); // Control de tiempo para esperas no bloqueantes
+//  if (timeNow - timeLast > wait) { // Manda un mensaje por MQTT cada 2 segundos
+//    timeLast = timeNow; // Actualización de seguimiento de tiempo
+//    char dataString[8]; // Define una arreglo de caracteres para enviarlos por MQTT, especifica la longitud del mensaje en 8 caracteres
+//    dtostrf(t, 2, 2, dataString);  // Esta es una función nativa de leguaje AVR que convierte un arreglo de caracteres en una variable String
+//    Serial.print("Temperatura: "); // Se imprime en monitor solo para poder visualizar que el evento sucede
+//    Serial.println(dataString);
+//    client.publish("CodigoIoT/SIC/Flow6/Temperatura", dataString); // Esta es la función que envía los datos por MQTT, especifica el tema y el valor
+//  } 
 
 //*************************************************
 }// Fin de void loop
@@ -178,11 +174,8 @@ void lecturaBotones(){
 void Logica(){
 
     //Cuando debe de encender la refrigeración manual
-  // (t > temAlta && (!dato2 || !dato3))
-  //Si temperatura es alta y cualquiera de (alta demanda o sobrecarga) se enciende refrigeración manual
-  // o 
-  // (|| !dato1) si se presiona el boton de manual
-  if (BtnWeb2 || (t > temAlta && (EstadoBoton2 || EstadoBoton3)) || EstadoBoton1) {
+  
+  if (BtnWeb1 || (t > temAlta && (EstadoBoton2 || EstadoBoton3)) || EstadoBoton1) {
     digitalWrite (LED1, 1);
     }
   else{
@@ -190,12 +183,8 @@ void Logica(){
     }
   
   // Cuando debe de encender Refrigeración automática
-  // t > temAlta con temperatura alta
-  // o 
-  // ((!dato2 || !dato3) && dato)
-  // Si se tiene alta demanda o sobrecarga y que no este presionado BOTON1 
-  // de manual por la prioridad
-  if (BtnWeb1 || t > temAlta || ((EstadoBoton2 || EstadoBoton3) && !EstadoBoton1)) {
+  
+  if (BtnWeb2 || BtnWeb3 || t > temAlta || ((EstadoBoton2 || EstadoBoton3) && !EstadoBoton1)) {
     digitalWrite (LED2, 1);
     }
   else{
@@ -208,36 +197,32 @@ void Logica(){
 void callback(char* topic, byte* message, unsigned int length) {
 
   // Indicar por serial que llegó un mensaje
-  Serial.print("Llegó un mensaje en el tema: ");
-  Serial.print(topic);
+  //Serial.print("Llegó un mensaje en el tema: ");
+  //Serial.print(topic);
+  //delay(300);
 
   // Concatenar los mensajes recibidos para conformarlos como una varialbe String
   String messageTemp; // Se declara la variable en la cual se generará el mensaje completo  
   for (int i = 0; i < length; i++) {  // Se imprime y concatena el mensaje
-    Serial.print((char)message[i]);
+    //Serial.print((char)message[i]);
     messageTemp += (char)message[i];
   }
 
   // Se comprueba que el mensaje se haya concatenado correctamente
-  Serial.println();
-  Serial.print ("Mensaje concatenado en una sola variable: ");
-  Serial.println (messageTemp);
+  //Serial.println();
+  //Serial.print ("Mensaje concatenado en una sola variable: ");
+  //Serial.println (messageTemp);
 
-  // En esta parte puedes agregar las funciones que requieras para actuar segun lo necesites al recibir un mensaje MQTT
-
-  // Ejemplo, en caso de recibir el mensaje true - false, se cambiará el estado del led soldado en la placa.
-  // El ESP323CAM está suscrito al tema esp/output
-  if (String(topic) == "esp32/output") {  // En caso de recibirse mensaje en el tema esp32/output
+  // El ESP323CAM está suscrito al tema 
+  if (String(topic) == TopicTx) {  // En caso de recibirse mensaje en el tema 
     if(messageTemp == "btn1on"){
      // Serial.println("Led encendido");
       BtnWeb1=1;
-      //digitalWrite(flashLedPin, HIGH);
-    }// fin del if (String(topic) == "esp32/output")
+    }
     else if(messageTemp == "btn1off"){
       //Serial.println("Led apagado");
       BtnWeb1=0;
-     // digitalWrite(flashLedPin, LOW);
-    }// fin del else if(messageTemp == "false")
+    }
 
     else if(messageTemp == "btn2on"){
       //Serial.println("Led apagado");
@@ -247,9 +232,15 @@ void callback(char* topic, byte* message, unsigned int length) {
       //Serial.println("Led apagado");
       BtnWeb2=0;  
     }
-  }// fin del if (String(topic) == "esp32/output")
-
-  
+    else if(messageTemp == "btn3on"){
+      //Serial.println("Led apagado");
+      BtnWeb3=1;
+    }
+    else if(messageTemp == "btn3off"){
+      //Serial.println("Led apagado");
+      BtnWeb3=0;  
+    }
+  }
 }// fin del void callback
 
 // Función para reconectarse
@@ -260,7 +251,7 @@ void reconnect() {
     // Intentar reconexión
     if (client.connect("ESP32CAMClient")) { //Pregunta por el resultado del intento de conexión
       Serial.println("Conectado");
-      client.subscribe("esp32/output"); // Esta función realiza la suscripción al tema
+      client.subscribe("CodigoIoT/SIC/Flow6/Botones"); // Esta función realiza la suscripción al tema
     }// fin del  if (client.connect("ESP32CAMClient"))
     else {  //en caso de que la conexión no se logre
       Serial.print("Conexion fallida, Error rc=");
