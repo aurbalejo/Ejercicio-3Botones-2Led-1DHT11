@@ -160,7 +160,9 @@ void lecturaSensor(){
   Serial.print(t);
   Serial.println(F("°C "));
   TiempoObjetivo = millis() +2000; // una vez que imprime temperatura se actualiza nuestro setpoint a los siguientes 20000 milisegundos
-  
+  char dataString[8]; // Define una arreglo de caracteres para enviarlos por MQTT, especifica la longitud del mensaje en 8 caracteres    
+  dtostrf(t, 2, 2, dataString);  // Esta es una función nativa de leguaje AVR que convierte un arreglo de caracteres en una variable String
+  client.publish("CodigoIoT/SIC/Flow6/Temperatura", dataString);
 }
 
 void lecturaBotones(){
@@ -196,22 +198,12 @@ void Logica(){
 // Esta función permite tomar acciones en caso de que se reciba un mensaje correspondiente a un tema al cual se hará una suscripción
 void callback(char* topic, byte* message, unsigned int length) {
 
-  // Indicar por serial que llegó un mensaje
-  //Serial.print("Llegó un mensaje en el tema: ");
-  //Serial.print(topic);
-  //delay(300);
-
   // Concatenar los mensajes recibidos para conformarlos como una varialbe String
   String messageTemp; // Se declara la variable en la cual se generará el mensaje completo  
   for (int i = 0; i < length; i++) {  // Se imprime y concatena el mensaje
     //Serial.print((char)message[i]);
     messageTemp += (char)message[i];
   }
-
-  // Se comprueba que el mensaje se haya concatenado correctamente
-  //Serial.println();
-  //Serial.print ("Mensaje concatenado en una sola variable: ");
-  //Serial.println (messageTemp);
 
   // El ESP323CAM está suscrito al tema 
   if (String(topic) == TopicTx) {  // En caso de recibirse mensaje en el tema 

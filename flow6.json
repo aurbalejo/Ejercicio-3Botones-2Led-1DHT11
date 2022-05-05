@@ -24,7 +24,8 @@
         "wires": [
             [
                 "dfd3f51c92736a67",
-                "25b1d5853c07fccc"
+                "25b1d5853c07fccc",
+                "1a8b234673bcc640"
             ]
         ]
     },
@@ -39,7 +40,7 @@
         "name": "",
         "label": "",
         "format": "{{msg.payload}}",
-        "layout": "row-spread",
+        "layout": "col-center",
         "className": "",
         "x": 430,
         "y": 120,
@@ -93,8 +94,8 @@
         "correl": "",
         "expiry": "",
         "broker": "cd19ad63313fa054",
-        "x": 510,
-        "y": 180,
+        "x": 490,
+        "y": 260,
         "wires": []
     },
     {
@@ -181,6 +182,23 @@
                 "33f9f28a2a006091"
             ]
         ]
+    },
+    {
+        "id": "1a8b234673bcc640",
+        "type": "ui_text",
+        "z": "1fa46118f4f122b4",
+        "group": "f8be81c57e27c5c1",
+        "order": 2,
+        "width": "6",
+        "height": "8",
+        "name": "",
+        "label": "Temperatura",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 450,
+        "y": 160,
+        "wires": []
     },
     {
         "id": "cd19ad63313fa054",
