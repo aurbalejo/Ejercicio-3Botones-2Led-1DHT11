@@ -33,8 +33,8 @@
 #include <WiFi.h>  // Biblioteca para el control de WiFi
 #include <PubSubClient.h> //Biblioteca para conexion MQTT
 
-const char* ssid = "IoT";  // Aquí debes poner el nombre de tu red
-const char* password = "cursoiot";  // Aquí debes poner la contraseña de tu red
+const char* ssid = "MEGACABLE-279F";  // Aquí debes poner el nombre de tu red
+const char* password = "Notiene13";  // Aquí debes poner la contraseña de tu red
 
 //Datos del broker MQTT
 const char* mqtt_server = "35.157.221.58"; // Si estas en una red local, coloca la IP asignada, en caso contrario, coloca la IP publica
